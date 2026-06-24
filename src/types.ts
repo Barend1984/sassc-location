@@ -14,6 +14,7 @@ export interface Customer {
   name: string;
   idNumber?: string;
   cell?: string;
+  whatsappCell?: string;
   altCell?: string;
   area?: string;
   grantType?: string;
