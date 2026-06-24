@@ -196,6 +196,7 @@ export default function App() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [config, setConfig] = useState<SystemConfig>(DEFAULT_CONFIG);
   const [currentView, setCurrentView] = useState<string>('dashboard');
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -1700,15 +1701,26 @@ Hiermee wil ons u in kennis stel dat ons u belangrike versoek/bestelling voltooi
                 <div className="space-y-6">
                   
                   {/* Back to list Navigation */}
-                  <button 
-                    onClick={() => {
-                      setCurrentView('customers');
-                      setSelectedCustomerId(null);
-                    }}
-                    className="flex items-center gap-1.5 text-xs text-[#e8a020] font-mono hover:text-white transition cursor-pointer"
-                  >
-                    <ArrowLeft className="w-4 h-4" /> Back to Recipient Index
-                  </button>
+                  <div className="flex items-center justify-between">
+                    <button 
+                      onClick={() => {
+                        setCurrentView('customers');
+                        setSelectedCustomerId(null);
+                      }}
+                      className="flex items-center gap-1.5 text-xs text-[#e8a020] font-mono hover:text-white transition cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> Back to Recipient Index
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCustomer({...activeCustomer});
+                        setCurrentView('edit-customer');
+                      }}
+                      className="flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg transition cursor-pointer font-mono"
+                    >
+                      ✏️ Edit Profile
+                    </button>
+                  </div>
 
                   {/* Customer Banner Core Card */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
@@ -2034,6 +2046,211 @@ Hiermee wil ons u in kennis stel dat ons u belangrike versoek/bestelling voltooi
                 className="bg-slate-950 border border-slate-800 hover:text-white px-4 py-1.5 rounded font-medium text-slate-400 cursor-pointer"
               >
                 Close Audit Overlay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================ */}
+      {/* EDIT CUSTOMER VIEW                                                */}
+      {/* ================================================================ */}
+      {currentView === 'edit-customer' && editingCustomer && (
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-950">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => {
+                setCurrentView('customer-detail');
+                setEditingCustomer(null);
+              }}
+              className="flex items-center gap-1.5 text-xs text-[#e8a020] font-mono hover:text-white transition cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" /> Cancel — Back to Profile
+            </button>
+            <span className="text-xs font-mono text-slate-500">Editing: {editingCustomer.id}</span>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-5">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 font-mono border-b border-slate-800 pb-3">
+              ✏️ Edit Customer Profile
+            </h2>
+
+            {/* Name + ID */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Full Name *</label>
+                <input
+                  type="text"
+                  value={editingCustomer.name}
+                  onChange={e => setEditingCustomer({...editingCustomer, name: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">SA ID Number</label>
+                <input
+                  type="text"
+                  value={editingCustomer.idNumber || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, idNumber: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                  maxLength={13}
+                />
+              </div>
+            </div>
+
+            {/* Cell + Alt Cell */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Cell Number</label>
+                <input
+                  type="tel"
+                  value={editingCustomer.cell || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, cell: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Caregiver / Alt Contact</label>
+                <input
+                  type="tel"
+                  value={editingCustomer.altCell || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, altCell: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Area + Grant Type */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Area / Village</label>
+                <input
+                  type="text"
+                  value={editingCustomer.area || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, area: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Grant Type</label>
+                <select
+                  value={editingCustomer.grantType || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, grantType: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                >
+                  <option value="">Select...</option>
+                  <option>Old Age Pension</option>
+                  <option>Disability Grant</option>
+                  <option>Child Support Grant</option>
+                  <option>Care Dependency Grant</option>
+                  <option>Foster Child Grant</option>
+                  <option>Social Relief of Distress</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Church + Pastor */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Church</label>
+                <input
+                  type="text"
+                  value={editingCustomer.church || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, church: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Pastor Contact</label>
+                <input
+                  type="text"
+                  value={editingCustomer.pastor || ''}
+                  onChange={e => setEditingCustomer({...editingCustomer, pastor: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Next of Kin */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Next of Kin</label>
+              <input
+                type="text"
+                value={editingCustomer.nextOfKin || ''}
+                onChange={e => setEditingCustomer({...editingCustomer, nextOfKin: e.target.value})}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+              />
+            </div>
+
+            {/* Home W3W */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Home what3words Address</label>
+              <input
+                type="text"
+                value={editingCustomer.homeW3W || ''}
+                onChange={e => setEditingCustomer({...editingCustomer, homeW3W: e.target.value.replace(/^\/\/\//, '')})}
+                placeholder="e.g. table.lamp.river"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none"
+              />
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-mono text-slate-500 uppercase font-semibold">Notes</label>
+              <textarea
+                value={editingCustomer.notes || ''}
+                onChange={e => setEditingCustomer({...editingCustomer, notes: e.target.value})}
+                rows={3}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-[#e8a020] outline-none resize-none"
+              />
+            </div>
+
+            {/* Consent toggle */}
+            <div className="flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-lg">
+              <input
+                type="checkbox"
+                id="edit-consent"
+                checked={editingCustomer.consentSigned}
+                onChange={e => setEditingCustomer({...editingCustomer, consentSigned: e.target.checked})}
+                className="w-4 h-4 accent-[#e8a020]"
+              />
+              <label htmlFor="edit-consent" className="text-xs text-slate-300 cursor-pointer">
+                POPIA consent confirmed — signed NCA credit agreement on file
+              </label>
+            </div>
+
+            {/* Save + Delete buttons */}
+            <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+              <button
+                onClick={() => {
+                  if (!window.confirm('Permanently delete this customer profile? This cannot be undone.')) return;
+                  const updated = customers.filter(c => c.id !== editingCustomer.id);
+                  setCustomers(updated);
+                  localStorage.setItem('sassc_loc_customers', JSON.stringify(updated));
+                  setEditingCustomer(null);
+                  setSelectedCustomerId(null);
+                  setCurrentView('customers');
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-rose-950/30 border border-rose-900/40 text-rose-400 hover:bg-rose-900/40 text-xs font-mono transition cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Delete Profile
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!editingCustomer.name.trim()) {
+                    alert('Customer name is required.');
+                    return;
+                  }
+                  const updated = customers.map(c => c.id === editingCustomer.id ? editingCustomer : c);
+                  setCustomers(updated);
+                  localStorage.setItem('sassc_loc_customers', JSON.stringify(updated));
+                  setEditingCustomer(null);
+                  setCurrentView('customer-detail');
+                }}
+                className="flex items-center gap-2 px-6 py-2 rounded-lg bg-[#e8a020] hover:bg-[#f0c050] text-black font-bold text-xs font-mono transition cursor-pointer"
+              >
+                <Check className="w-3.5 h-3.5" /> Save Changes
               </button>
             </div>
           </div>
