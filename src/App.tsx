@@ -21,7 +21,8 @@ const DEFAULT_CONFIG: SystemConfig = {
 // Helper to generate secure HTTPS URLs for customer sharing
 const getSecureUrl = (cid: string): string => {
   const origin = window.location.origin.replace(/^http:\/\//i, 'https://');
-  return `${origin}${window.location.pathname}?cid=${cid}`;
+  const encoded = btoa(cid); // Base64 encode — hides customer ID and system name
+  return `${origin}${window.location.pathname}?ref=${encoded}`;
 };
 
 const getFallbackW3W = (lat: number, lng: number): string => {
@@ -265,9 +266,10 @@ export default function App() {
       }
     }
 
-    // Detect URL Params
+    // Detect URL Params — decode Base64 ref parameter
     const params = new URLSearchParams(window.location.search);
-    const cid = params.get('cid');
+    const ref = params.get('ref');
+    const cid = ref ? atob(ref) : null; // Decode Base64 back to real customer ID
     if (cid) {
       setCustomerCid(cid);
       const exists = currentRecords.some(c => c.id === cid);
@@ -890,8 +892,8 @@ Hiermee wil ons u in kennis stel dat ons u belangrike versoek/bestelling voltooi
           <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-8 flex flex-col items-center text-center">
             
             <div className="space-y-1">
-              <span className="text-xs uppercase tracking-widest text-[#e8a020] font-mono font-bold">SASSC Location Intelligence</span>
-              <h2 className="text-sm text-slate-400 font-medium">Safe Delivery Coordinates Capture</h2>
+              <span className="text-xs uppercase tracking-widest text-[#e8a020] font-mono font-bold">Delivery Confirmation Portal</span>
+              <h2 className="text-sm text-slate-400 font-medium">Secure Identity Verification Required</h2>
             </div>
 
             <div className="w-20 h-20 rounded-full bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-3xl shadow-inner shadow-slate-950 animate-pulse">
