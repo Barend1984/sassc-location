@@ -1,9 +1,38 @@
+# Dependencies
 node_modules/
-build/
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
 dist/
-coverage/
+build/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+Thumbsdb
+
+# Logs
 *.log
-.env*
-!.env.example
-desktop.ini 
+logs/
+
+# Archives
+*.zip
+*.rar
+*.tar.gz
+
+# Temporary files
+tmp/
+temp/
